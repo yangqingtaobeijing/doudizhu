@@ -349,34 +349,33 @@ function cardOffset(index: number, total: number): string {
     <div class="flex-1 flex flex-col relative min-h-0">
 
       <!-- 上方AI区域 -->
-      <div class="flex justify-between px-4 sm:px-8 pt-3 shrink-0">
+      <div class="flex justify-between px-2 sm:px-8 pt-3 shrink-0 gap-4 sm:gap-8">
         <!-- AI 左 (player index 1) -->
-        <div class="flex flex-col items-center gap-1 min-w-[100px]">
-          <div class="flex items-center gap-2">
-            <div class="w-10 h-10 rounded-full bg-green-700 border-2 border-green-500 flex items-center justify-center text-lg">
+        <div class="flex flex-col items-center gap-1 flex-1">
+          <div class="flex items-center gap-1.5">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-700 border-2 border-green-500 flex items-center justify-center text-base sm:text-lg">
               🤖
             </div>
             <div class="text-left">
-              <div class="text-white text-sm font-medium">AI-左</div>
+              <div class="text-white text-xs sm:text-sm font-medium">AI-左</div>
               <div v-if="store.players[1].role" class="text-xs font-bold" :class="getPlayerRoleClass(1)">
                 {{ store.players[1].role === 'landlord' ? '👑 地主' : '🌾 农民' }}
               </div>
             </div>
           </div>
-          <!-- AI手牌数量 -->
-          <div class="flex gap-[-4px] mt-1">
+          <!-- AI手牌：手机上只显示3张小牌 + 数量 -->
+          <div class="flex mt-1">
             <PlayingCard
-              v-for="i in Math.min(store.players[1].hand.length, 6)"
+              v-for="i in Math.min(store.players[1].hand.length, 3)"
               :key="i"
               face-down
               size="sm"
-              class="-ml-4 first:ml-0"
+              class="-ml-3 first:ml-0"
             />
-            <span v-if="store.players[1].hand.length > 6" class="text-green-300/60 text-xs ml-1 self-center">
+            <span class="text-green-300/70 text-xs ml-1.5 self-center font-medium">
               ×{{ store.players[1].hand.length }}
             </span>
           </div>
-          <div class="text-green-300/60 text-xs">{{ store.players[1].hand.length }} 张</div>
           <!-- AI1 出牌展示 / 思考动画 -->
           <div class="min-h-[60px] flex items-center justify-center">
             <div v-if="aiThinking && store.currentPlayerIndex === 1" class="thinking-dots text-yellow-300 text-sm">
@@ -399,32 +398,31 @@ function cardOffset(index: number, total: number): string {
         </div>
 
         <!-- AI 右 (player index 2) -->
-        <div class="flex flex-col items-center gap-1 min-w-[100px]">
-          <div class="flex items-center gap-2">
+        <div class="flex flex-col items-center gap-1 flex-1">
+          <div class="flex items-center gap-1.5">
             <div class="text-right">
-              <div class="text-white text-sm font-medium">AI-右</div>
+              <div class="text-white text-xs sm:text-sm font-medium">AI-右</div>
               <div v-if="store.players[2].role" class="text-xs font-bold" :class="getPlayerRoleClass(2)">
                 {{ store.players[2].role === 'landlord' ? '👑 地主' : '🌾 农民' }}
               </div>
             </div>
-            <div class="w-10 h-10 rounded-full bg-green-700 border-2 border-green-500 flex items-center justify-center text-lg">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-700 border-2 border-green-500 flex items-center justify-center text-base sm:text-lg">
               🤖
             </div>
           </div>
-          <!-- AI手牌数量 -->
-          <div class="flex gap-[-4px] mt-1">
+          <!-- AI手牌：手机上只显示3张小牌 + 数量 -->
+          <div class="flex mt-1">
             <PlayingCard
-              v-for="i in Math.min(store.players[2].hand.length, 6)"
+              v-for="i in Math.min(store.players[2].hand.length, 3)"
               :key="i"
               face-down
               size="sm"
-              class="-ml-4 first:ml-0"
+              class="-ml-3 first:ml-0"
             />
-            <span v-if="store.players[2].hand.length > 6" class="text-green-300/60 text-xs ml-1 self-center">
+            <span class="text-green-300/70 text-xs ml-1.5 self-center font-medium">
               ×{{ store.players[2].hand.length }}
             </span>
           </div>
-          <div class="text-green-300/60 text-xs">{{ store.players[2].hand.length }} 张</div>
           <!-- AI2 出牌展示 / 思考动画 -->
           <div class="min-h-[60px] flex items-center justify-center">
             <div v-if="aiThinking && store.currentPlayerIndex === 2" class="thinking-dots text-yellow-300 text-sm">
