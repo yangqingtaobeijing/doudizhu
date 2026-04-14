@@ -311,35 +311,37 @@ function cardOffset(index: number, total: number): string {
   <div class="h-screen w-screen bg-gradient-to-b from-[#073d22] via-[#0a5c36] to-[#084a2a] overflow-hidden relative select-none flex flex-col">
 
     <!-- 顶部状态栏 -->
-    <div class="flex items-center justify-between px-4 py-2 bg-black/20 text-sm shrink-0">
-      <div class="flex items-center gap-3">
-        <span class="text-green-300/70">
-          难度：<span class="text-yellow-300">{{ store.difficulty === 'easy' ? '简单' : store.difficulty === 'normal' ? '普通' : '困难' }}</span>
-        </span>
-        <span class="text-green-300/70">
-          阶段：<span class="text-yellow-300">
-            {{ store.phase === 'role_select' ? '角色选择' : store.phase === 'playing' ? '出牌中' : store.phase === 'dealing' ? '发牌中' : '' }}
+    <div class="relative px-4 py-2 bg-black/20 text-sm shrink-0">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-green-300/70 text-xs sm:text-sm">
+            难度：<span class="text-yellow-300">{{ store.difficulty === 'easy' ? '简单' : store.difficulty === 'normal' ? '普通' : '困难' }}</span>
           </span>
-        </span>
-      </div>
-      <!-- 退出按钮 -->
-      <button
-        @click="confirmQuit"
-        class="px-3 py-1 rounded text-xs font-medium bg-red-800/60 text-red-200 hover:bg-red-700/80 active:scale-95 transition-all"
-      >
-        退出
-      </button>
+          <span class="text-green-300/70 text-xs sm:text-sm">
+            阶段：<span class="text-yellow-300">
+              {{ store.phase === 'role_select' ? '角色选择' : store.phase === 'playing' ? '出牌中' : store.phase === 'dealing' ? '发牌中' : '' }}
+            </span>
+          </span>
+          <!-- 底牌区 -->
+          <div class="flex items-center gap-1">
+            <span class="text-green-300/60 text-xs mr-1">底牌：</span>
+            <PlayingCard
+              v-for="card in store.landlordCards"
+              :key="card.id"
+              :card="card"
+              :face-down="store.phase === 'role_select' || store.phase === 'dealing'"
+              size="sm"
+            />
+          </div>
+        </div>
 
-      <!-- 底牌区 -->
-      <div class="flex items-center gap-1">
-        <span class="text-green-300/60 text-xs mr-1">底牌：</span>
-        <PlayingCard
-          v-for="card in store.landlordCards"
-          :key="card.id"
-          :card="card"
-          :face-down="store.phase === 'role_select' || store.phase === 'dealing'"
-          size="sm"
-        />
+        <!-- 退出按钮：独立在右侧，不挤压 -->
+        <button
+          @click="confirmQuit"
+          class="ml-3 px-3 py-1.5 rounded text-xs font-medium bg-red-800/60 text-red-200 hover:bg-red-700/80 active:scale-95 transition-all shrink-0"
+        >
+          退出
+        </button>
       </div>
     </div>
 
