@@ -11,6 +11,8 @@ import { useGameStore } from '@/stores/gameStore'
 import { identifyCardType, findAllPlays, canBeat } from '@/engine/cardUtils'
 import { GamePhase, Role } from '@/engine/types'
 import type { Card, CardCombo } from '@/engine/types'
+import { aiDecide } from '@/ai'
+import type { AIContext } from '@/ai'
 import PlayingCard from '@/components/PlayingCard.vue'
 
 const router = useRouter()
@@ -165,8 +167,30 @@ function showHint() {
 }
 
 // ============================================================
-// AI 出牌逻辑
+// AI 出牌逻辑（集成完整 AI 模块）
 // ============================================================
+
+/**
+ * 为 AI 构造决策上下文
+ * 从 gameStore 中提取 AI 决策所需的全部信息
+ */
+function buildAIContext(aiIndex: number): AIContext {
+  const player = store.players[aiIndex]
+  return {
+    myHand: player.hand,
+    myRole: player.role!,
+    lastPlay: store.lastPlay && store.lastPlayerIndex !== aiIndex ? store.lastPlay : null,
+    lastPlayerIndex: store.lastPlayerIndex,
+    myIndex: aiIndex,
+    handSizes: [
+      store.players[0].hand.length,
+      store.players[1].hand.length,
+      store.players[2].hand.length,
+    ] as [number, number, number],
+    bombCount: store.bombCount,
+    difficulty: store.difficulty,
+  }
+}
 
 /** 运行AI出牌回合 */
 async function runAiTurn() {
@@ -174,22 +198,20 @@ async function runAiTurn() {
     const aiIndex = store.currentPlayerIndex
     aiThinking.value = true
 
-    // 模拟思考延迟
+    // 模拟思考延迟（AI 模块本身是同步的，这里保留延迟让玩家看清）
     await delay(800 + Math.random() * 800)
 
     if (store.phase !== GamePhase.Playing) break
 
-    const aiHand = store.players[aiIndex].hand
-    const lastPlay = store.lastPlay && store.lastPlayerIndex !== aiIndex ? store.lastPlay : null
-    const plays = findAllPlays(aiHand, lastPlay)
+    // 构造 AI 上下文并调用完整 AI 决策
+    const ctx = buildAIContext(aiIndex)
+    const decision = aiDecide(ctx)
 
-    if (plays.length > 0) {
-      // 简单AI策略：随机选一个合法出牌（实际AI模块可替换此逻辑）
-      const chosen = selectAiPlay(plays, aiIndex)
-      store.playCards(aiIndex, chosen.cards)
-      recentPlays.value[aiIndex] = chosen
+    if (decision.action === 'play') {
+      store.playCards(aiIndex, decision.combo.cards)
+      recentPlays.value[aiIndex] = decision.combo
     } else {
-      // 没有可出的牌，Pass
+      // AI 决定不出牌
       store.pass(aiIndex)
       recentPlays.value[aiIndex] = 'pass'
     }
@@ -207,26 +229,6 @@ async function runAiTurn() {
     await delay(300)
   }
   aiThinking.value = false
-}
-
-/** AI选牌策略（简化版，按难度选择） */
-function selectAiPlay(plays: CardCombo[], _aiIndex: number): CardCombo {
-  const diff = store.difficulty
-  if (diff === 'easy') {
-    // 简单：随机出最小的
-    plays.sort((a, b) => a.mainValue - b.mainValue)
-    return plays[0]
-  } else if (diff === 'hard') {
-    // 困难：出中间偏大的牌
-    plays.sort((a, b) => a.mainValue - b.mainValue)
-    const idx = Math.min(plays.length - 1, Math.floor(plays.length * 0.6))
-    return plays[idx]
-  } else {
-    // 普通：出最小的
-    plays.sort((a, b) => a.mainValue - b.mainValue)
-    const idx = Math.min(plays.length - 1, Math.floor(plays.length * 0.3))
-    return plays[idx]
-  }
 }
 
 function delay(ms: number): Promise<void> {
