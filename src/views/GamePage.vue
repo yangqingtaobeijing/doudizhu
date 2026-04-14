@@ -489,8 +489,8 @@ function cardOffset(index: number, total: number): string {
         </div>
 
         <!-- 玩家手牌 -->
-        <div class="flex justify-center px-4">
-          <div class="flex items-end" style="margin-left: 20px; min-height: 8.5rem;">
+        <div class="player-hand-scroll px-4">
+          <div class="flex items-end justify-center" style="min-height: 8.5rem; padding-top: 1.5rem;">
             <div
               v-for="(card, index) in playerHand"
               :key="card.id"
@@ -610,5 +610,14 @@ function cardOffset(index: number, total: number): string {
   0%, 20% { opacity: 0; }
   50% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* 玩家手牌区域：横向可滚动，选中牌上移不被裁 */
+.player-hand-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  justify-content: center;
 }
 </style>
